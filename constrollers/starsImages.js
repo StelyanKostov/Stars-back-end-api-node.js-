@@ -1,4 +1,4 @@
-const starsImages = require('../models/starsImages')
+const starsImagesModel = require('../models/starsImages')
 
 module.exports = {
     getStarsImages(req, res) {
@@ -8,7 +8,7 @@ module.exports = {
         // res.setHeader('Access-Control-Allow-Credentials', true);
         console.log(req.query.name)
         let name = req.query.name;
-        starsImages.find({ name: name }).then(images => {
+        starsImagesModel.find({ name: name }).then(images => {
 
             res.json(images)
 
@@ -20,7 +20,57 @@ module.exports = {
         let name = req.body.name;
         let path = req.body.path
         console.log(path)
-        starsImages.create({ name, path })
-        res.send("all good")
+        starsImagesModel.create({ name, path })
+
+    },
+    allImages(req, res) {
+
+        starsImagesModel.find().then(data => res.json(data))
+    },
+
+    searchByString(req, res) {
+
+        let string = req.query.string;
+
+        console.log(string)
+
+        starsImagesModel.find().then(data => {
+
+            data = data.filter(x => x.name.toUpperCase().includes(string.toUpperCase()))
+            res.json(data)
+        })
+
+    },
+    editImagesById(req, res) {
+
+        // assets/nina dobrev/nina dobrev.jpg
+        let id = req.body.id || "61991e5015f7ac7c1b463703"
+        let name = req.body.name || "Nina"
+        let path = req.body.path || "path"
+
+        console.log(id + name + path)
+        starsImagesModel.findOne({ id: id }).then(images => {
+            images.name = name
+            images.path = path
+            images.save()
+            res.send("sucksess")
+        })
+
+
+    },
+
+    getImagesByPathAndName(req, res) {
+
+        console.log(req.query.name + req.query.path)
+        starsImagesModel.findOne({ name: req.query.name, path: req.query.path }).then(image => res.json(image))
+
+    },
+    deleteImagesByName(req, res) {
+
+        let name = req.query.name || '';
+
+        console.log(name)
+        starsImagesModel.deleteMany({ name: name }).then(data => res.send("all is good"));
     }
+
 }
