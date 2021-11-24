@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 
 module.exports = () => {
-    mongoose.connect(config.dbURL)
+    return mongoose.connect(config.dbURL)
     console.log('ready DB')
 
     require('../models/starsImages')
