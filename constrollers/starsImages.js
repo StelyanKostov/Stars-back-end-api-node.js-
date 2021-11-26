@@ -1,5 +1,4 @@
 const starsImagesModel = require('../models/starsImages')
-
 module.exports = {
     getStarsImages(req, res) {
         // res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
@@ -71,6 +70,22 @@ module.exports = {
 
         console.log(name)
         starsImagesModel.deleteMany({ name: name }).then(data => res.send("all is good"));
-    }
+    },
 
+    async uploadImage(req, res) {
+
+        const fs = require('fs')
+        let name = req.body.name;
+        let count;
+        await starsImagesModel.count({ name: name }).then(a => count = a)
+        count++;
+        let form = req.body.file;
+        let path = __dirname + '\\..\\..\\stars\\Stars\\src\\assets\\img\\' + name + count + ".jpg"
+        let data = form.split(',')[1]
+        let buff = Buffer.from(data, 'base64')
+        fs.writeFileSync(path, buff);
+        let pathForDb = `assets\\img\\` + name + count + '.jpg'
+        starsImagesModel.create({ name: name, path: pathForDb })
+
+    }
 }
