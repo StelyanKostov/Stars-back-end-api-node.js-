@@ -5,4 +5,7 @@ let schema = mongoose.Schema({
     path: String
 })
 
+
+
+
 module.exports = mongoose.model('StarsVideos', schema);

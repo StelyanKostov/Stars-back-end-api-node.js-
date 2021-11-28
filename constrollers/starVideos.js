@@ -3,15 +3,31 @@ let starVideosModel = require('../models/starsVideos');
 
 module.exports = {
 
-    addVideo(req, res) {
+    async addVideo(req, res) {
+
+        const fs = require('fs')
 
         let name = req.body.name;
-        let path = req.body.path;
+        let form = req.body.video;
 
-        console.log(name + '-' + path)
-        starVideosModel.create({ name: name, path: path })
+        console.log(form)
 
-        res.send("all is good")
+        let count;
+        await starVideosModel.count({ name: name }).then(a => count = a)
+        count++;
+
+        let path = __dirname + '\\..\\..\\stars\\Stars\\src\\assets\\videos\\' + name + count + ".mp4"
+        let data = form.split(',')[1]
+
+        let buff = Buffer.from(data, 'base64')
+
+        fs.writeFileSync(path, buff);
+
+        let pathForDb = `assets\\videos\\` + name + count + '.mp4'
+
+        starVideosModel.create({ name: name, path: pathForDb })
+
+
     },
 
     getAllVideos(req, res) {

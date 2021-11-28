@@ -1,4 +1,5 @@
 const starsImagesModel = require('../models/starsImages')
+
 module.exports = {
     getStarsImages(req, res) {
         // res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
@@ -14,12 +15,25 @@ module.exports = {
         })
 
     },
-    addImages(req, res) {
+    async addImages(req, res) {
 
         let name = req.body.name;
-        let path = req.body.path
-        console.log(path)
-        starsImagesModel.create({ name, path })
+        let image = req.body.image;
+
+        console.log(image)
+
+
+        const fs = require('fs')
+        let count;
+        await starsImagesModel.count({ name: name }).then(a => count = a)
+        count++;
+        let path = __dirname + '\\..\\..\\stars\\Stars\\src\\assets\\img\\' + name + count + ".jpg"
+        let data = image.split(',')[1]
+        let buff = Buffer.from(data, 'base64')
+        fs.writeFileSync(path, buff);
+        let pathForDb = `assets\\img\\` + name + count + '.jpg'
+        starsImagesModel.create({ name: name, path: pathForDb })
+
 
     },
     allImages(req, res) {
@@ -72,20 +86,20 @@ module.exports = {
         starsImagesModel.deleteMany({ name: name }).then(data => res.send("all is good"));
     },
 
-    async uploadImage(req, res) {
+    // async uploadImage(req, res) {
 
-        const fs = require('fs')
-        let name = req.body.name;
-        let count;
-        await starsImagesModel.count({ name: name }).then(a => count = a)
-        count++;
-        let form = req.body.file;
-        let path = __dirname + '\\..\\..\\stars\\Stars\\src\\assets\\img\\' + name + count + ".jpg"
-        let data = form.split(',')[1]
-        let buff = Buffer.from(data, 'base64')
-        fs.writeFileSync(path, buff);
-        let pathForDb = `assets\\img\\` + name + count + '.jpg'
-        starsImagesModel.create({ name: name, path: pathForDb })
+    //     const fs = require('fs')
+    //     let name = req.body.name;
+    //     let count;
+    //     await starsImagesModel.count({ name: name }).then(a => count = a)
+    //     count++;
+    //     let form = req.body.file;
+    //     let path = __dirname + '\\..\\..\\stars\\Stars\\src\\assets\\img\\' + name + count + ".jpg"
+    //     let data = form.split(',')[1]
+    //     let buff = Buffer.from(data, 'base64')
+    //     fs.writeFileSync(path, buff);
+    //     let pathForDb = `assets\\img\\` + name + count + '.jpg'
+    //     starsImagesModel.create({ name: name, path: pathForDb })
 
-    }
+    // }
 }
